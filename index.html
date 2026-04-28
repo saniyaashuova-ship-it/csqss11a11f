@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS Flashcards</title>
+  <style>
+    :root {
+      --bg: #edf2f6;
+      --surface: #ffffff;
+      --text: #112433;
+      --muted: #5a7184;
+      --border: #c9d7e3;
+      --primary: #0c6e5c;
+      --primary-soft: #e3f3ef;
+      --easy: #1f9d63;
+      --medium: #d88f11;
+      --hard: #b54343;
+      --shadow: 0 10px 24px rgba(18, 38, 51, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f5f8fb 0%, #ecf1f5 100%);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .header {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: #f5f9fc;
+    }
+
+    .pill.easy { color: var(--easy); border-color: #8bd6b1; background: #eefaf3; }
+    .pill.medium { color: var(--medium); border-color: #eccf8b; background: #fff8e8; }
+    .pill.hard { color: var(--hard); border-color: #f1b2b2; background: #fff0f0; }
+
+    .layout {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 320px 1fr;
+      align-items: start;
+    }
+
+    h2 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      font-size: 14px;
+      margin-top: 5px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 84px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      transition: 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn-secondary {
+      background: #f6faf9;
+      border-color: #b8dacf;
+      color: #0f5e51;
+    }
+
+    .btn-danger {
+      background: #fff1f1;
+      border-color: #f0b8b8;
+      color: #8d2f2f;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 2fr 1.2fr 1fr auto auto;
+      margin-bottom: 12px;
+    }
+
+    .controls button {
+      width: auto;
+      white-space: nowrap;
+      align-self: end;
+      padding-inline: 14px;
+      margin-top: 0;
+    }
+
+    .board {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .column {
+      background: #f8fbfd;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      min-height: 280px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .column h3 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .column.easy h3 { color: var(--easy); }
+    .column.medium h3 { color: var(--medium); }
+    .column.hard h3 { color: var(--hard); }
+
+    .card {
+      background: #fff;
+      border: 1px solid #dce7f0;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 4px 10px rgba(16, 38, 56, 0.05);
+      display: grid;
+      gap: 8px;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .question {
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .answer {
+      border-top: 1px dashed #cddae5;
+      padding-top: 8px;
+      color: #1f384b;
+      display: none;
+    }
+
+    .answer.visible {
+      display: block;
+    }
+
+    .actions {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .move-buttons {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .empty {
+      padding: 18px 10px;
+      text-align: center;
+      border: 1px dashed #cad7e2;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      background: #fcfeff;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .board {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="panel header">
+      <div>
+        <h1 class="title">CS Flashcards Studio</h1>
+      </div>
+      <div class="stats">
+        <span id="countAll" class="pill">0 total</span>
+        <span id="countEasy" class="pill easy">0 easy</span>
+        <span id="countMedium" class="pill medium">0 medium</span>
+        <span id="countHard" class="pill hard">0 hard</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <h2>Add Flashcard</h2>
+        <form id="cardForm">
+          <label>Question
+            <textarea id="question" required placeholder="What does HTTP stand for?"></textarea>
+          </label>
+          <label>Answer
+            <textarea id="answer" required placeholder="HyperText Transfer Protocol"></textarea>
+          </label>
+          <div class="grid-2">
+            <label>Category
+              <input id="category" type="text" placeholder="Networking" required>
+            </label>
+            <label>Difficulty
+              <select id="difficulty" required>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </label>
+          </div>
+          <button class="btn-primary" type="submit">Save Flashcard</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Study Board</h2>
+        <div class="controls">
+          <label>Search
+            <input id="searchText" type="text" placeholder="question, answer, or category">
+          </label>
+          <label>Category
+            <input id="categoryFilter" type="text" placeholder="all categories">
+          </label>
+          <label>Sort
+            <select id="sortBy">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="az">A-Z Category</option>
+            </select>
+          </label>
+          <button id="showRecent" class="btn-secondary" type="button">Newest 3</button>
+          <button id="showAll" type="button">Reset</button>
+        </div>
+
+        <div class="board">
+          <div class="column easy">
+            <h3>Easy</h3>
+            <div id="easyList"></div>
+          </div>
+          <div class="column medium">
+            <h3>Medium</h3>
+            <div id="mediumList"></div>
+          </div>
+          <div class="column hard">
+            <h3>Hard</h3>
+            <div id="hardList"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+  <script>
+    const STORAGE_KEY = "flashcards_sqlite_db_v2";
+    let db = null;
+    const state = {
+      searchText: "",
+      categoryFilter: "",
+      sortBy: "newest",
+      limitRecent: null,
+      revealMap: {}
+    };
+
+    function escapeHtml(text) {
+      const value = String(text || "");
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function persistDb() {
+      if (!db) return;
+      const binaryArray = db.export();
+      const bytes = Array.from(binaryArray, (byte) => String.fromCharCode(byte)).join("");
+      localStorage.setItem(STORAGE_KEY, btoa(bytes));
+    }
+
+    function loadDbBufferFromStorage() {
+      const base64 = localStorage.getItem(STORAGE_KEY);
+      if (!base64) return null;
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes;
+    }
+
+    function runSelect(sqlText, params = []) {
+      const result = db.exec(sqlText, params);
+      if (!result.length) return [];
+      return result[0].values.map((row) => ({
+        id: row[0],
+        question: row[1],
+        answer: row[2],
+        category: row[3],
+        difficulty: row[4],
+        created_at: row[5]
+      }));
+    }
+
+    function getAllCards() {
+      return runSelect(
+        "SELECT id, question, answer, category, difficulty, created_at FROM flashcards ORDER BY id DESC;"
+      );
+    }
+
+    function applyFilters(cards) {
+      let filtered = cards.filter((card) => {
+        const search = state.searchText.toLowerCase();
+        const category = state.categoryFilter.toLowerCase();
+        const joined = `${card.question} ${card.answer} ${card.category}`.toLowerCase();
+        const passSearch = !search || joined.includes(search);
+        const passCategory = !category || card.category.toLowerCase().includes(category);
+        return passSearch && passCategory;
+      });
+
+      if (state.sortBy === "oldest") {
+        filtered.sort((a, b) => a.id - b.id);
+      } else if (state.sortBy === "az") {
+        filtered.sort((a, b) => a.category.localeCompare(b.category));
+      } else {
+        filtered.sort((a, b) => b.id - a.id);
+      }
+
+      if (typeof state.limitRecent === "number") {
+        filtered = filtered.slice(0, state.limitRecent);
+      }
+
+      return filtered;
+    }
+
+    function updateStats(cards) {
+      const easy = cards.filter((c) => c.difficulty === "Easy").length;
+      const medium = cards.filter((c) => c.difficulty === "Medium").length;
+      const hard = cards.filter((c) => c.difficulty === "Hard").length;
+      document.getElementById("countAll").textContent = `${cards.length} total`;
+      document.getElementById("countEasy").textContent = `${easy} easy`;
+      document.getElementById("countMedium").textContent = `${medium} medium`;
+      document.getElementById("countHard").textContent = `${hard} hard`;
+    }
+
+    function cardTemplate(card) {
+      const isVisible = Boolean(state.revealMap[card.id]);
+      return `
+        <article class="card">
+          <div class="card-meta">
+            <span>#${card.id} · ${escapeHtml(card.category)}</span>
+            <span>${escapeHtml(card.created_at)}</span>
+          </div>
+          <div class="question">${escapeHtml(card.question)}</div>
+          <div class="answer ${isVisible ? "visible" : ""}">${escapeHtml(card.answer)}</div>
+          <div class="actions">
+            <button data-action="toggle-answer" data-id="${card.id}" class="btn-secondary" type="button">
+              ${isVisible ? "Hide" : "Reveal"}
+            </button>
+            <button data-action="delete" data-id="${card.id}" class="btn-danger" type="button">Delete</button>
+          </div>
+          <div class="move-buttons">
+            <button data-action="move" data-id="${card.id}" data-value="Easy" type="button">Easy</button>
+            <button data-action="move" data-id="${card.id}" data-value="Medium" type="button">Medium</button>
+            <button data-action="move" data-id="${card.id}" data-value="Hard" type="button">Hard</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function render() {
+      const allCards = getAllCards();
+      updateStats(allCards);
+      const list = applyFilters(allCards);
+      const buckets = { Easy: [], Medium: [], Hard: [] };
+      for (const card of list) {
+        if (!buckets[card.difficulty]) continue;
+        buckets[card.difficulty].push(cardTemplate(card));
+      }
+      document.getElementById("easyList").innerHTML = buckets.Easy.length
+        ? buckets.Easy.join("")
+        : '<div class="empty">No easy cards match this filter.</div>';
+      document.getElementById("mediumList").innerHTML = buckets.Medium.length
+        ? buckets.Medium.join("")
+        : '<div class="empty">No medium cards match this filter.</div>';
+      document.getElementById("hardList").innerHTML = buckets.Hard.length
+        ? buckets.Hard.join("")
+        : '<div class="empty">No hard cards match this filter.</div>';
+    }
+
+    function insertCard(question, answer, category, difficulty) {
+      const createdAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+      db.run(
+        "INSERT INTO flashcards (question, answer, category, difficulty, created_at) VALUES (?, ?, ?, ?, ?);",
+        [question, answer, category, difficulty, createdAt]
+      );
+      persistDb();
+    }
+
+    function moveCard(id, difficulty) {
+      db.run("UPDATE flashcards SET difficulty = ? WHERE id = ?;", [difficulty, id]);
+      persistDb();
+    }
+
+    function deleteCard(id) {
+      db.run("DELETE FROM flashcards WHERE id = ?;", [id]);
+      delete state.revealMap[id];
+      persistDb();
+    }
+
+    function resetFilters() {
+      state.searchText = "";
+      state.categoryFilter = "";
+      state.sortBy = "newest";
+      state.limitRecent = null;
+      document.getElementById("searchText").value = "";
+      document.getElementById("categoryFilter").value = "";
+      document.getElementById("sortBy").value = "newest";
+      render();
+    }
+
+    document.getElementById("cardForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const question = document.getElementById("question").value.trim();
+      const answer = document.getElementById("answer").value.trim();
+      const category = document.getElementById("category").value.trim();
+      const difficulty = document.getElementById("difficulty").value;
+      if (!question || !answer || !category) return;
+      insertCard(question, answer, category, difficulty);
+      state.limitRecent = null;
+      event.target.reset();
+      render();
+    });
+
+    document.getElementById("searchText").addEventListener("input", (event) => {
+      state.searchText = event.target.value;
+      state.limitRecent = null;
+      render();
+    });
+
+    document.getElementById("categoryFilter").addEventListener("input", (event) => {
+      state.categoryFilter = event.target.value;
+      state.limitRecent = null;
+      render();
+    });
+
+    document.getElementById("sortBy").addEventListener("change", (event) => {
+      state.sortBy = event.target.value;
+      render();
+    });
+
+    document.getElementById("showRecent").addEventListener("click", () => {
+      state.limitRecent = 3;
+      state.sortBy = "newest";
+      document.getElementById("sortBy").value = "newest";
+      render();
+    });
+
+    document.getElementById("showAll").addEventListener("click", resetFilters);
+
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("button[data-action]");
+      if (!target) return;
+      const id = Number(target.dataset.id);
+      const action = target.dataset.action;
+      if (!id || !action) return;
+      if (action === "toggle-answer") {
+        state.revealMap[id] = !state.revealMap[id];
+      } else if (action === "move") {
+        const nextDifficulty = target.dataset.value;
+        if (nextDifficulty) moveCard(id, nextDifficulty);
+      } else if (action === "delete") {
+        deleteCard(id);
+      }
+      render();
+    });
+
+    async function initDb() {
+      const SQL = await initSqlJs({
+        locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+      });
+      const savedBuffer = loadDbBufferFromStorage();
+      db = savedBuffer ? new SQL.Database(savedBuffer) : new SQL.Database();
+      db.run(`CREATE TABLE IF NOT EXISTS flashcards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        category TEXT NOT NULL,
+        difficulty TEXT NOT NULL CHECK(difficulty IN ('Easy', 'Medium', 'Hard')),
+        created_at DATETIME NOT NULL
+      );`);
+      persistDb();
+      render();
+    }
+
+    initDb().catch((error) => {
+      console.error("Failed to initialize SQL library:", error);
+      document.getElementById("easyList").innerHTML =
+        '<div class="empty">Could not load SQL library. Check internet and refresh.</div>';
+      document.getElementById("mediumList").innerHTML =
+        '<div class="empty">Could not load SQL library. Check internet and refresh.</div>';
+      document.getElementById("hardList").innerHTML =
+        '<div class="empty">Could not load SQL library. Check internet and refresh.</div>';
+    });
+  </script>
+</body>
+</html>
